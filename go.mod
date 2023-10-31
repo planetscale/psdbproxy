@@ -8,7 +8,6 @@ require (
 	github.com/planetscale/psdb v0.0.0-20231031205845-c667a0f67df1
 	github.com/planetscale/vitess-types v0.0.0-20231005172453-a4a7c0c1df6a
 	github.com/spf13/pflag v1.0.5
-	go.uber.org/zap v1.26.0
 	vitess.io/vitess v0.18.0-rc1
 )
 
@@ -24,7 +23,6 @@ require (
 	github.com/Microsoft/go-winio v0.6.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
-	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/ebitengine/purego v0.5.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
@@ -38,7 +36,6 @@ require (
 	github.com/klauspost/compress v1.17.2 // indirect
 	github.com/klauspost/connect-compress/v2 v2.0.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
-	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/opentracing-contrib/go-grpc v0.0.0-20210225150812-73cb765af46e // indirect
@@ -79,7 +76,6 @@ require (
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.14.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
-	google.golang.org/genproto v0.0.0-20231016165738-49dd2c1f3d0b // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231030173426-d783a09b4405 // indirect
 	google.golang.org/grpc v1.59.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect

@@ -3,6 +3,7 @@ package mysqlgrpc
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"sync"
 	"time"
 
@@ -11,7 +12,6 @@ import (
 	psdbpb "github.com/planetscale/psdb/types/psdb/v1alpha1"
 	"github.com/planetscale/psdb/types/psdb/v1alpha1/psdbv1alpha1connect"
 	querypb "github.com/planetscale/vitess-types/gen/vitess/query/v16"
-	"go.uber.org/zap"
 	"vitess.io/vitess/go/mysql"
 	"vitess.io/vitess/go/mysql/replication"
 	"vitess.io/vitess/go/mysql/sqlerror"
@@ -35,7 +35,7 @@ func (s *Server) handler() *handler {
 type handler struct {
 	mysql.UnimplementedHandler
 
-	logger *zap.Logger
+	logger *slog.Logger
 	client psdbv1alpha1connect.DatabaseClient
 
 	connectionsMu sync.RWMutex
@@ -57,10 +57,12 @@ func (h *handler) NewConnection(c *mysql.Conn) {
 	h.connections[c] = &clientData{start: time.Now()}
 	h.connectionsMu.Unlock()
 
-	h.logger.Debug(
+	h.logger.LogAttrs(
+		context.Background(),
+		slog.LevelDebug,
 		"new connection",
-		zap.Stringer("addr", c.GetRawConn().LocalAddr()),
-		zap.Uint32("mysql_id", c.ConnectionID),
+		slog.String("addr", c.GetRawConn().LocalAddr().String()),
+		slog.Int("mysql_id", int(c.ConnectionID)),
 	)
 }
 
@@ -70,10 +72,12 @@ func (h *handler) ConnectionClosed(c *mysql.Conn) {
 	delete(h.connections, c)
 	h.connectionsMu.Unlock()
 
-	h.logger.Debug(
+	h.logger.LogAttrs(
+		context.Background(),
+		slog.LevelDebug,
 		"connection closed",
-		zap.Uint32("mysql_id", c.ConnectionID),
-		zap.Duration("duration", time.Since(start)),
+		slog.Int("mysql_id", int(c.ConnectionID)),
+		slog.Duration("duration", time.Since(start)),
 	)
 }
 

@@ -2,18 +2,19 @@ package mysqlgrpc
 
 import (
 	"crypto/tls"
+	"io"
+	"log/slog"
 	"net"
 	"time"
 
 	"github.com/golang/glog"
 	"github.com/planetscale/psdb/auth"
-	"go.uber.org/zap"
 	"vitess.io/vitess/go/mysql"
 )
 
 type Server struct {
 	Name          string
-	Logger        *zap.Logger
+	Logger        *slog.Logger
 	Addr          string
 	UpstreamAddr  string
 	Authorization *auth.Authorization
@@ -63,7 +64,7 @@ func (s *Server) ListenAndServe() error {
 
 func (s *Server) ensureSetup() {
 	if s.Logger == nil {
-		s.Logger = zap.NewNop()
+		s.Logger = slog.New(slog.NewTextHandler(io.Discard, nil))
 	}
 
 	// XXX: suppress all global glog output, since this is internal to vitess

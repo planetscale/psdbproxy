@@ -2,13 +2,12 @@ package main
 
 import (
 	"flag"
+	"log/slog"
 	"os"
 
 	"github.com/planetscale/mysqlgrpc"
 	"github.com/planetscale/psdb/auth"
 	"github.com/spf13/pflag"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 )
 
 var (
@@ -28,22 +27,13 @@ func init() {
 	flag.CommandLine.Parse([]string{})
 }
 
-func makeLogger(level zapcore.Level) *zap.Logger {
-	cfg := zap.NewProductionConfig()
-	cfg.Level = zap.NewAtomicLevelAt(level)
-	l, err := cfg.Build()
-	if err != nil {
-		panic(err)
-	}
-	return l
-}
-
 func main() {
-	logger := makeLogger(zap.DebugLevel)
-	defer logger.Sync()
+	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	}))
 
 	s := &mysqlgrpc.Server{
-		Logger:       logger.With(zap.String("component", "proxy")),
+		Logger:       logger.With(slog.String("component", "proxy")),
 		Addr:         *flagListen,
 		UpstreamAddr: *flagHost,
 		Authorization: auth.NewBasicAuth(
@@ -57,8 +47,14 @@ func main() {
 		ch <- s.ListenAndServe()
 	}()
 
-	logger.Info("mysql server listening", zap.String("addr", *flagListen))
+	logger.Info(
+		"mysql server listening",
+		"addr", *flagListen,
+	)
 	if err := <-ch; err != nil {
-		logger.Fatal("oops", zap.Error(err))
+		logger.Error(
+			"oops",
+			"err", err,
+		)
 	}
 }
