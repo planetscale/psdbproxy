@@ -2,6 +2,7 @@ package mysqlgrpc
 
 import (
 	"crypto/tls"
+	"flag"
 	"io"
 	"log/slog"
 	"net"
@@ -19,7 +20,8 @@ type Server struct {
 	UpstreamAddr  string
 	Authorization *auth.Authorization
 	TLSConfig     *tls.Config
-	ServerVersion string
+
+	listener *mysql.Listener
 
 	mysql.UnimplementedHandler
 }
@@ -50,6 +52,7 @@ func (s *Server) Serve(l net.Listener) error {
 		listener.RequireSecureTransport = true
 	}
 
+	s.listener = listener
 	listener.Accept()
 	return nil
 }
@@ -62,9 +65,27 @@ func (s *Server) ListenAndServe() error {
 	return s.Serve(l)
 }
 
+func (s *Server) Shutdown() {
+	if s.listener != nil {
+		s.listener.Shutdown()
+	}
+}
+
+func (s *Server) Close() {
+	if s.listener != nil {
+		s.listener.Close()
+	}
+}
+
 func (s *Server) ensureSetup() {
 	if s.Logger == nil {
 		s.Logger = slog.New(slog.NewTextHandler(io.Discard, nil))
+	}
+
+	// XXX: vitess requires default commandline flags to be parsed,
+	// but if they are not, fake it so it doesn't panic.
+	if !flag.Parsed() {
+		flag.CommandLine.Parse([]string{})
 	}
 
 	// XXX: suppress all global glog output, since this is internal to vitess

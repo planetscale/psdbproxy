@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"log/slog"
 	"os"
 
@@ -22,9 +21,6 @@ var (
 
 func init() {
 	commandLine.Parse(os.Args[1:])
-
-	// needed to make vitess happy
-	flag.CommandLine.Parse([]string{})
 }
 
 func main() {
