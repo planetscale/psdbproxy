@@ -1,4 +1,4 @@
-package mysqlgrpc
+package psdbproxy
 
 // The unsafe code in this file is a 0 allocation type cast. This is unsafe if the types
 // are not actually equivalent. Their memory layouts must be identical, and in our case,

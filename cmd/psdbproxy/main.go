@@ -4,8 +4,8 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/planetscale/mysqlgrpc"
 	"github.com/planetscale/psdb/auth"
+	"github.com/planetscale/psdbproxy"
 	"github.com/spf13/pflag"
 )
 
@@ -28,7 +28,7 @@ func main() {
 		Level: slog.LevelDebug,
 	}))
 
-	s := &mysqlgrpc.Server{
+	s := &psdbproxy.Server{
 		Logger:       logger.With(slog.String("component", "proxy")),
 		Addr:         *flagListen,
 		UpstreamAddr: *flagHost,

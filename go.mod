@@ -1,4 +1,4 @@
-module github.com/planetscale/mysqlgrpc
+module github.com/planetscale/psdbproxy
 
 go 1.21
 

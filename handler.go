@@ -1,4 +1,4 @@
-package mysqlgrpc
+package psdbproxy
 
 import (
 	"context"
