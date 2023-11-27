@@ -20,6 +20,7 @@ type Server struct {
 	Logger        *slog.Logger
 	Addr          string
 	UpstreamAddr  string
+	ReadTimeout   time.Duration
 	Authorization *auth.Authorization
 	TLSConfig     *tls.Config
 
@@ -40,7 +41,7 @@ func (s *Server) Serve(l net.Listener) error {
 		Listener:            l,
 		AuthServer:          mysql.NewAuthServerNone(),
 		Handler:             handler,
-		ConnReadTimeout:     30 * time.Second,
+		ConnReadTimeout:     s.ReadTimeout,
 		ConnWriteTimeout:    30 * time.Second,
 		ConnBufferPooling:   true,
 		ConnKeepAlivePeriod: 30 * time.Second,
