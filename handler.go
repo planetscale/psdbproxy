@@ -20,6 +20,8 @@ import (
 	"vitess.io/vitess/go/vt/vterrors"
 )
 
+var errNotImplemented = errors.New("not implemented")
+
 func (s *Server) handler() *handler {
 	return &handler{
 		logger: s.Logger,
@@ -104,6 +106,15 @@ func (h *handler) clientData(c *mysql.Conn) *clientData {
 func (h *handler) ComQuery(c *mysql.Conn, query string, callback func(*sqltypes.Result) error) error {
 	data := h.clientData(c)
 
+	defer h.logger.LogAttrs(
+		context.Background(),
+		slog.LevelDebug,
+		"execute",
+		slog.String("addr", c.GetRawConn().LocalAddr().String()),
+		slog.Int("mysql_id", int(c.ConnectionID)),
+		slog.String("query", query),
+	)
+
 	if data.IsOLAP() {
 		return h.streamExecute(data, query, emptyBindVars, callback)
 	}
@@ -183,15 +194,15 @@ func (h *handler) ComStmtExecute(c *mysql.Conn, prepare *mysql.PrepareData, call
 }
 
 func (h *handler) ComRegisterReplica(c *mysql.Conn, replicaHost string, replicaPort uint16, replicaUser string, replicaPassword string) error {
-	return errors.New("not implemented")
+	return errNotImplemented
 }
 
 func (h *handler) ComBinlogDump(c *mysql.Conn, logFile string, binlogPos uint32) error {
-	return errors.New("not implemented")
+	return errNotImplemented
 }
 
 func (h *handler) ComBinlogDumpGTID(c *mysql.Conn, logFile string, logPos uint64, gtidSet replication.GTIDSet) error {
-	return errors.New("not implemented")
+	return errNotImplemented
 }
 
 func (h *handler) WarningCount(c *mysql.Conn) uint16 {

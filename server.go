@@ -1,8 +1,10 @@
 package mysqlgrpc
 
 import (
+	"context"
 	"crypto/tls"
 	"flag"
+	"fmt"
 	"io"
 	"log/slog"
 	"net"
@@ -88,11 +90,19 @@ func (s *Server) ensureSetup() {
 		flag.CommandLine.Parse([]string{})
 	}
 
+	vtLogger := s.Logger.With("component", "vitess")
+
+	vtLog := func(f string, a ...any) {
+		if vtLogger.Enabled(context.Background(), slog.LevelDebug) {
+			vtLogger.Debug(fmt.Sprintf(f, a...))
+		}
+	}
+
 	// XXX: suppress all global glog output, since this is internal to vitess
 	glog.SetLogger(&glog.LoggerFunc{
-		DebugfFunc: func(f string, a ...any) {},
-		InfofFunc:  func(f string, a ...any) {},
-		WarnfFunc:  func(f string, a ...any) {},
-		ErrorfFunc: func(f string, a ...any) {},
+		DebugfFunc: vtLog,
+		InfofFunc:  vtLog,
+		WarnfFunc:  vtLog,
+		ErrorfFunc: vtLog,
 	})
 }
