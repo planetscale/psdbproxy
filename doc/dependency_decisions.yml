@@ -1,0 +1,38 @@
+---
+- - :permit
+  - MIT
+  - :who:
+    :why:
+    :versions: []
+    :when: 2023-11-29 19:28:35.943736000 Z
+- - :permit
+  - Apache 2.0
+  - :who:
+    :why:
+    :versions: []
+    :when: 2023-11-29 19:28:58.769927000 Z
+- - :permit
+  - New BSD
+  - :who:
+    :why:
+    :versions: []
+    :when: 2023-11-29 19:29:30.950785000 Z
+- - :permit
+  - Simplified BSD
+  - :who:
+    :why:
+    :versions: []
+    :when: 2023-11-29 19:29:39.698237000 Z
+- - :permit
+  - Mozilla Public License 2.0
+  - :who:
+    :why:
+    :versions: []
+    :when: 2023-11-29 19:29:49.185926000 Z
+- - :license
+  - github.com/DataDog/sketches-go
+  - Apache 2.0
+  - :who:
+    :why:
+    :versions: []
+    :when: 2023-11-29 19:30:26.817927000 Z
