@@ -2,7 +2,6 @@ package psdbproxy
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"io"
 	"log/slog"
@@ -21,7 +20,6 @@ type Server struct {
 	UpstreamAddr  string
 	ReadTimeout   time.Duration
 	Authorization *auth.Authorization
-	TLSConfig     *tls.Config
 
 	listener *mysql.Listener
 
@@ -51,11 +49,6 @@ func (s *Server) Serve(l net.Listener) error {
 	})
 	if err != nil {
 		return err
-	}
-
-	if s.TLSConfig != nil {
-		listener.TLSConfig.Store(s.TLSConfig.Clone())
-		listener.RequireSecureTransport = true
 	}
 
 	s.listener = listener
