@@ -5,8 +5,9 @@ import (
 	"os"
 
 	"github.com/planetscale/psdb/auth"
-	"github.com/planetscale/psdbproxy"
 	"github.com/spf13/pflag"
+
+	"github.com/planetscale/psdbproxy"
 )
 
 var (
