@@ -3,7 +3,6 @@ package psdbproxy
 import (
 	"context"
 	"crypto/tls"
-	"flag"
 	"fmt"
 	"io"
 	"log/slog"
@@ -32,7 +31,10 @@ type Server struct {
 func (s *Server) Serve(l net.Listener) error {
 	s.ensureSetup()
 
-	handler := s.handler()
+	handler, err := s.handler()
+	if err != nil {
+		return err
+	}
 	if err := handler.testCredentials(5 * time.Second); err != nil {
 		return err
 	}
@@ -45,6 +47,7 @@ func (s *Server) Serve(l net.Listener) error {
 		ConnWriteTimeout:    30 * time.Second,
 		ConnBufferPooling:   true,
 		ConnKeepAlivePeriod: 30 * time.Second,
+		MySQLServerVersion:  mysqlVersion,
 	})
 	if err != nil {
 		return err
@@ -85,14 +88,7 @@ func (s *Server) ensureSetup() {
 		s.Logger = slog.New(slog.NewTextHandler(io.Discard, nil))
 	}
 
-	// XXX: vitess requires default commandline flags to be parsed,
-	// but if they are not, fake it so it doesn't panic.
-	if !flag.Parsed() {
-		flag.CommandLine.Parse([]string{})
-	}
-
 	vtLogger := s.Logger.With("component", "vitess")
-
 	vtLog := func(f string, a ...any) {
 		if vtLogger.Enabled(context.Background(), slog.LevelDebug) {
 			vtLogger.Debug(fmt.Sprintf(f, a...))
