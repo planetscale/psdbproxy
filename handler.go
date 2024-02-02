@@ -17,7 +17,7 @@ import (
 	"vitess.io/vitess/go/mysql/sqlerror"
 	"vitess.io/vitess/go/sqltypes"
 	vitessquerypb "vitess.io/vitess/go/vt/proto/query"
-	"vitess.io/vitess/go/vt/sqlparser"
+	"vitess.io/vitess/go/vt/vtenv"
 	"vitess.io/vitess/go/vt/vterrors"
 )
 
@@ -26,7 +26,7 @@ var errNotImplemented = errors.New("not implemented")
 const mysqlVersion = "8.0.34-psdbproxy"
 
 func (s *Server) handler() (*handler, error) {
-	parser, err := sqlparser.New(sqlparser.Options{
+	env, err := vtenv.New(vtenv.Options{
 		MySQLServerVersion: mysqlVersion,
 	})
 	if err != nil {
@@ -41,7 +41,7 @@ func (s *Server) handler() (*handler, error) {
 			s.Authorization,
 		),
 		connections: map[*mysql.Conn]*clientData{},
-		parser:      parser,
+		env:         env,
 	}, nil
 }
 
@@ -54,7 +54,7 @@ type handler struct {
 	connectionsMu sync.RWMutex
 	connections   map[*mysql.Conn]*clientData
 
-	parser *sqlparser.Parser
+	env *vtenv.Environment
 }
 
 func (h *handler) testCredentials(timeout time.Duration) error {
@@ -303,8 +303,8 @@ func (h *handler) streamExecute(c *mysql.Conn, data *clientData, query string, b
 	return nil
 }
 
-func (h *handler) SQLParser() *sqlparser.Parser {
-	return h.parser
+func (h *handler) Env() *vtenv.Environment {
+	return h.env
 }
 
 func bindSession(c *mysql.Conn, data *clientData, session *psdbpb.Session) {

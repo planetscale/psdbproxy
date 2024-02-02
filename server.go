@@ -45,7 +45,6 @@ func (s *Server) Serve(l net.Listener) error {
 		ConnWriteTimeout:    30 * time.Second,
 		ConnBufferPooling:   true,
 		ConnKeepAlivePeriod: 30 * time.Second,
-		MySQLServerVersion:  mysqlVersion,
 	})
 	if err != nil {
 		return err
