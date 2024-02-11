@@ -126,6 +126,7 @@ func (h *handler) ComQuery(c *mysql.Conn, query string, callback func(*sqltypes.
 		slog.String("addr", c.GetRawConn().LocalAddr().String()),
 		slog.Int("mysql_id", int(c.ConnectionID)),
 		slog.String("query", query),
+		slog.Bool("olap", data.IsOLAP()),
 	)
 
 	if data.IsOLAP() {
@@ -157,6 +158,15 @@ func (h *handler) ComQuery(c *mysql.Conn, query string, callback func(*sqltypes.
 func (h *handler) ComPrepare(c *mysql.Conn, query string, bindVars map[string]*vitessquerypb.BindVariable) ([]*vitessquerypb.Field, error) {
 	data := h.clientData(c)
 
+	defer h.logger.LogAttrs(
+		context.Background(),
+		slog.LevelDebug,
+		"prepare",
+		slog.String("addr", c.GetRawConn().LocalAddr().String()),
+		slog.Int("mysql_id", int(c.ConnectionID)),
+		slog.String("query", query),
+	)
+
 	resp, err := h.client.Prepare(context.Background(), connect.NewRequest(&psdbpb.PrepareRequest{
 		Session:       data.Session,
 		Query:         query,
@@ -179,6 +189,16 @@ func (h *handler) ComPrepare(c *mysql.Conn, query string, bindVars map[string]*v
 
 func (h *handler) ComStmtExecute(c *mysql.Conn, prepare *mysql.PrepareData, callback func(*sqltypes.Result) error) error {
 	data := h.clientData(c)
+
+	defer h.logger.LogAttrs(
+		context.Background(),
+		slog.LevelDebug,
+		"stmt_execute",
+		slog.String("addr", c.GetRawConn().LocalAddr().String()),
+		slog.Int("mysql_id", int(c.ConnectionID)),
+		slog.String("query", prepare.PrepareStmt),
+		slog.Bool("olap", data.IsOLAP()),
+	)
 
 	if data.IsOLAP() {
 		return h.streamExecute(c, data, prepare.PrepareStmt, castBindVars(prepare.BindVars), callback)
