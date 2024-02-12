@@ -68,15 +68,19 @@ func (h *handler) testCredentials(timeout time.Duration) error {
 }
 
 func (h *handler) NewConnection(c *mysql.Conn) {
+	data := &clientData{
+		start:      time.Now(),
+		remoteAddr: c.RemoteAddr().String(),
+	}
 	h.connectionsMu.Lock()
-	h.connections[c] = &clientData{start: time.Now()}
+	h.connections[c] = data
 	h.connectionsMu.Unlock()
 
 	h.logger.LogAttrs(
 		context.Background(),
 		slog.LevelDebug,
 		"new connection",
-		slog.String("addr", c.GetRawConn().LocalAddr().String()),
+		slog.String("addr", data.remoteAddr),
 		slog.Int("mysql_id", int(c.ConnectionID)),
 	)
 }
@@ -84,6 +88,7 @@ func (h *handler) NewConnection(c *mysql.Conn) {
 func (h *handler) ConnectionClosed(c *mysql.Conn) {
 	h.connectionsMu.Lock()
 	start := h.connections[c].start
+	remoteAddr := h.connections[c].remoteAddr
 	delete(h.connections, c)
 	h.connectionsMu.Unlock()
 
@@ -91,14 +96,16 @@ func (h *handler) ConnectionClosed(c *mysql.Conn) {
 		context.Background(),
 		slog.LevelDebug,
 		"connection closed",
+		slog.String("addr", remoteAddr),
 		slog.Int("mysql_id", int(c.ConnectionID)),
 		slog.Duration("duration", time.Since(start)),
 	)
 }
 
 type clientData struct {
-	start   time.Time
-	Session *psdbpb.Session
+	start      time.Time
+	remoteAddr string
+	Session    *psdbpb.Session
 }
 
 func (d *clientData) IsOLAP() bool {
@@ -123,7 +130,7 @@ func (h *handler) ComQuery(c *mysql.Conn, query string, callback func(*sqltypes.
 		context.Background(),
 		slog.LevelDebug,
 		"execute",
-		slog.String("addr", c.GetRawConn().LocalAddr().String()),
+		slog.String("addr", data.remoteAddr),
 		slog.Int("mysql_id", int(c.ConnectionID)),
 		slog.String("query", query),
 		slog.Bool("olap", data.IsOLAP()),
@@ -162,7 +169,7 @@ func (h *handler) ComPrepare(c *mysql.Conn, query string, bindVars map[string]*v
 		context.Background(),
 		slog.LevelDebug,
 		"prepare",
-		slog.String("addr", c.GetRawConn().LocalAddr().String()),
+		slog.String("addr", data.remoteAddr),
 		slog.Int("mysql_id", int(c.ConnectionID)),
 		slog.String("query", query),
 	)
@@ -194,7 +201,7 @@ func (h *handler) ComStmtExecute(c *mysql.Conn, prepare *mysql.PrepareData, call
 		context.Background(),
 		slog.LevelDebug,
 		"stmt_execute",
-		slog.String("addr", c.GetRawConn().LocalAddr().String()),
+		slog.String("addr", data.remoteAddr),
 		slog.Int("mysql_id", int(c.ConnectionID)),
 		slog.String("query", prepare.PrepareStmt),
 		slog.Bool("olap", data.IsOLAP()),
