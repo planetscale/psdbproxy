@@ -12,7 +12,7 @@ require (
 	// we depend on latest main here.
 	// Once a fix for https://github.com/vitessio/vitess/issues/16015 is out, we can pin to that version.
 	// For now, pin to pain with the fixes.
-	vitess.io/vitess v0.10.3-0.20240927074858-3e5371377b43
+	vitess.io/vitess v0.20.2
 )
 
 require (
@@ -20,7 +20,6 @@ require (
 	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/klauspost/connect-compress/v2 v2.0.0 // indirect
 	github.com/pires/go-proxyproto v0.7.0 // indirect
-	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/slok/noglog v0.2.0 // indirect
 	golang.org/x/sys v0.25.0 // indirect
