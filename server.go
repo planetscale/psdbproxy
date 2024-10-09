@@ -26,7 +26,7 @@ type Server struct {
 	mysql.UnimplementedHandler
 }
 
-func (s *Server) Serve(l net.Listener) error {
+func (s *Server) Serve(l net.Listener, authMethod mysql.AuthMethodDescription) error {
 	s.ensureSetup()
 
 	handler, err := s.handler()
@@ -37,9 +37,19 @@ func (s *Server) Serve(l net.Listener) error {
 		return err
 	}
 
+	var auth mysql.AuthServer
+	switch authMethod {
+	case mysql.CachingSha2Password:
+		auth = &cachingSha2AuthServerNone{}
+	case mysql.MysqlNativePassword:
+		auth = mysql.NewAuthServerNone()
+	default:
+		return fmt.Errorf("unsupported auth method: %v", authMethod)
+	}
+
 	listener, err := mysql.NewListenerWithConfig(mysql.ListenerConfig{
 		Listener:            l,
-		AuthServer:          mysql.NewAuthServerNone(),
+		AuthServer:          auth,
 		Handler:             handler,
 		ConnReadTimeout:     s.ReadTimeout,
 		ConnWriteTimeout:    30 * time.Second,
@@ -55,12 +65,12 @@ func (s *Server) Serve(l net.Listener) error {
 	return nil
 }
 
-func (s *Server) ListenAndServe() error {
+func (s *Server) ListenAndServe(authMethod mysql.AuthMethodDescription) error {
 	l, err := net.Listen("tcp", s.Addr)
 	if err != nil {
 		return err
 	}
-	return s.Serve(l)
+	return s.Serve(l, authMethod)
 }
 
 func (s *Server) Shutdown() {

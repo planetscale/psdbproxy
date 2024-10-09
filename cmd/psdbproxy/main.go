@@ -7,6 +7,7 @@ import (
 	"github.com/planetscale/psdb/auth"
 	"github.com/planetscale/psdbproxy"
 	"github.com/spf13/pflag"
+	"vitess.io/vitess/go/mysql"
 )
 
 var (
@@ -40,7 +41,7 @@ func main() {
 
 	ch := make(chan error)
 	go func() {
-		ch <- s.ListenAndServe()
+		ch <- s.ListenAndServe(mysql.CachingSha2Password)
 	}()
 
 	logger.Info(
