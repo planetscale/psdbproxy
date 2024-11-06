@@ -1,6 +1,6 @@
 module github.com/planetscale/psdbproxy
 
-go 1.23.1
+go 1.23.2
 
 require (
 	connectrpc.com/connect v1.14.0
@@ -12,7 +12,7 @@ require (
 	// we depend on latest main here.
 	// Once a fix for https://github.com/vitessio/vitess/issues/16015 is out, we can pin to that version.
 	// For now, pin to pain with the fixes.
-	vitess.io/vitess v0.10.3-0.20240927074858-3e5371377b43
+	vitess.io/vitess v0.10.3-0.20241106191105-e87457ee2401
 )
 
 require (
