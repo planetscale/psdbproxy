@@ -48,5 +48,5 @@ google.golang.org/protobuf v1.34.2 h1:6xV6lTsCfpGD21XK49h7MhtcApnLqkfYgPcdHftf6h
 google.golang.org/protobuf v1.34.2/go.mod h1:qYOHts0dSfpeUzUFpOMr/WGzszTmLH+DiWniOlNbLDw=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
-vitess.io/vitess v0.10.3-0.20240927074858-3e5371377b43 h1:IBR+Goi7C09x7onan2kBqHLbexJUCfhz1GUh433Nyb8=
-vitess.io/vitess v0.10.3-0.20240927074858-3e5371377b43/go.mod h1:3weMu3lKGlOErrkmHdQaGyXlM/UOBk9nwPDDnfHHkrY=
+vitess.io/vitess v0.10.3-0.20241106191105-e87457ee2401 h1:eDPyVI8jsS033ozooz5hWrDNNwzFK+1Iwf/p5L18ldo=
+vitess.io/vitess v0.10.3-0.20241106191105-e87457ee2401/go.mod h1:f+eDnWAcHRMo9p6G03lfdgcZtDTq+u9PukALsi6KezU=
