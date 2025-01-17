@@ -280,6 +280,14 @@ func (h *handler) streamExecute(c *mysql.Conn, data *clientData, query string, b
 		// we need to bind it to the mysql.Conn like normal
 		if resp.Session != nil {
 			bindSession(c, data, resp.Session)
+
+			// XXX: bindSession copies the pointer into data.Session
+			// so resp.Session here cannot be mutated otherwise we'll
+			// mutate the Session stored inside of data.
+			// Specifically doing a resp.Session.Reset() will
+			// zero out the struct that is being referenced now
+			// in data.session.
+			resp.Session = nil
 		}
 
 		// If we have ane error, we just return the error
@@ -312,9 +320,6 @@ func (h *handler) streamExecute(c *mysql.Conn, data *clientData, query string, b
 		// See: https://pkg.go.dev/google.golang.org/protobuf/proto#Reset
 		// So this maintains the actual structs, but zeroed out.
 
-		if resp.Session != nil {
-			resp.Session.Reset()
-		}
 		if resp.Result != nil {
 			resp.Result.Reset()
 		}
