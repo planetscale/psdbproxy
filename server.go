@@ -10,6 +10,7 @@ import (
 
 	"github.com/golang/glog"
 	"github.com/planetscale/psdb/auth"
+	"github.com/planetscale/psdb/core/client"
 	"vitess.io/vitess/go/mysql"
 )
 
@@ -20,6 +21,7 @@ type Server struct {
 	UpstreamAddr  string
 	ReadTimeout   time.Duration
 	Authorization *auth.Authorization
+	ClientOptions []client.Option
 
 	listener *mysql.Listener
 

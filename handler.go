@@ -39,6 +39,7 @@ func (s *Server) handler() (*handler, error) {
 			s.UpstreamAddr,
 			psdbv1alpha1connect.NewDatabaseClient,
 			s.Authorization,
+			s.ClientOptions...,
 		),
 		connections: map[*mysql.Conn]*clientData{},
 		env:         env,
