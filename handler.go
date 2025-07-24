@@ -1,9 +1,13 @@
 package psdbproxy
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
+	"io"
 	"log/slog"
+	"os"
 	"sync"
 	"time"
 
@@ -179,6 +183,14 @@ func (h *handler) ComPrepare(c *mysql.Conn, query string, bindVars map[string]*v
 		Query:         query,
 		BindVariables: castBindVars(bindVars),
 	}))
+
+	var out bytes.Buffer
+
+	out.Write([]byte(query))
+	out.Write([]byte("\n"))
+	json.NewEncoder(&out).Encode(resp)
+	io.Copy(os.Stdout, &out)
+
 	if resp != nil && resp.Msg != nil {
 		bindSession(c, data, resp.Msg.GetSession())
 	}
