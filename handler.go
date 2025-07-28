@@ -11,7 +11,7 @@ import (
 	"github.com/planetscale/psdb/core/client"
 	psdbpb "github.com/planetscale/psdb/types/psdb/v1alpha1"
 	"github.com/planetscale/psdb/types/psdb/v1alpha1/psdbv1alpha1connect"
-	querypb "github.com/planetscale/vitess-types/gen/vitess/query/v16"
+	querypb "github.com/planetscale/vitess-types/gen/vitess/query/v21"
 	"vitess.io/vitess/go/mysql"
 	"vitess.io/vitess/go/mysql/replication"
 	"vitess.io/vitess/go/mysql/sqlerror"
