@@ -14,8 +14,8 @@ package psdbproxy
 import (
 	"unsafe"
 
-	querypb "github.com/planetscale/vitess-types/gen/vitess/query/v16"
-	vtrpcpb "github.com/planetscale/vitess-types/gen/vitess/vtrpc/v16"
+	querypb "github.com/planetscale/vitess-types/gen/vitess/query/v21"
+	vtrpcpb "github.com/planetscale/vitess-types/gen/vitess/vtrpc/v21"
 	vitessquerypb "vitess.io/vitess/go/vt/proto/query"
 	vitessvtrpcpb "vitess.io/vitess/go/vt/proto/vtrpc"
 )
