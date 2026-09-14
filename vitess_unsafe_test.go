@@ -8,8 +8,8 @@ import (
 	"testing"
 	"unsafe"
 
-	querypb "github.com/planetscale/vitess-types/gen/vitess/query/v21"
-	vtrpcpb "github.com/planetscale/vitess-types/gen/vitess/vtrpc/v21"
+	querypb "github.com/planetscale/vitess-types/gen/vitess/query/v22"
+	vtrpcpb "github.com/planetscale/vitess-types/gen/vitess/vtrpc/v22"
 	vitessquerypb "vitess.io/vitess/go/vt/proto/query"
 	vitessvtrpcpb "vitess.io/vitess/go/vt/proto/vtrpc"
 )

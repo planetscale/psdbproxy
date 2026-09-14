@@ -11,7 +11,7 @@ import (
 	"github.com/planetscale/psdb/core/client"
 	psdbpb "github.com/planetscale/psdb/types/psdb/v1alpha1"
 	"github.com/planetscale/psdb/types/psdb/v1alpha1/psdbv1alpha1connect"
-	querypb "github.com/planetscale/vitess-types/gen/vitess/query/v21"
+	querypb "github.com/planetscale/vitess-types/gen/vitess/query/v22"
 	"vitess.io/vitess/go/mysql"
 	"vitess.io/vitess/go/mysql/replication"
 	"vitess.io/vitess/go/mysql/sqlerror"
@@ -162,7 +162,7 @@ func (h *handler) ComQuery(c *mysql.Conn, query string, callback func(*sqltypes.
 	)
 }
 
-func (h *handler) ComPrepare(c *mysql.Conn, query string, bindVars map[string]*vitessquerypb.BindVariable) ([]*vitessquerypb.Field, error) {
+func (h *handler) ComPrepare(c *mysql.Conn, query string) ([]*vitessquerypb.Field, uint16, error) {
 	data := h.clientData(c)
 
 	defer h.logger.LogAttrs(
@@ -175,23 +175,22 @@ func (h *handler) ComPrepare(c *mysql.Conn, query string, bindVars map[string]*v
 	)
 
 	resp, err := h.client.Prepare(context.Background(), connect.NewRequest(&psdbpb.PrepareRequest{
-		Session:       data.Session,
-		Query:         query,
-		BindVariables: castBindVars(bindVars),
+		Session: data.Session,
+		Query:   query,
 	}))
 	if resp != nil && resp.Msg != nil {
 		bindSession(c, data, resp.Msg.GetSession())
 	}
 	if err != nil {
-		return nil, sqlerror.NewSQLErrorFromError(err)
+		return nil, 0, sqlerror.NewSQLErrorFromError(err)
 	}
 	if resp.Msg.Error != nil {
-		return nil, sqlerror.NewSQLErrorFromError(vterrors.FromVTRPC(
+		return nil, 0, sqlerror.NewSQLErrorFromError(vterrors.FromVTRPC(
 			castRPCError(resp.Msg.Error)),
 		)
 	}
 
-	return castFields(resp.Msg.GetFields()), nil
+	return castFields(resp.Msg.GetFields()), uint16(resp.Msg.GetParamsCount()), nil
 }
 
 func (h *handler) ComStmtExecute(c *mysql.Conn, prepare *mysql.PrepareData, callback func(*sqltypes.Result) error) error {
@@ -231,6 +230,9 @@ func (h *handler) ComStmtExecute(c *mysql.Conn, prepare *mysql.PrepareData, call
 	return callback(sqltypes.Proto3ToResult(
 		castQueryResult(resp.Msg.GetResult())),
 	)
+}
+func (h *handler) ComQueryMulti(c *mysql.Conn, sql string, callback func(qr sqltypes.QueryResponse, more bool, firstPacket bool) error) error {
+	return errNotImplemented
 }
 
 func (h *handler) ComRegisterReplica(c *mysql.Conn, replicaHost string, replicaPort uint16, replicaUser string, replicaPassword string) error {
