@@ -139,7 +139,7 @@ func (h *handler) ComQuery(c *mysql.Conn, query string, callback func(*sqltypes.
 	)
 
 	if data.IsOLAP() {
-		return h.streamExecute(c, data, query, emptyBindVars, callback)
+		return h.streamExecute(c, data, query, emptyBindVars, false, callback)
 	}
 
 	resp, err := h.client.Execute(context.Background(), connect.NewRequest(&psdbpb.ExecuteRequest{
@@ -209,13 +209,14 @@ func (h *handler) ComStmtExecute(c *mysql.Conn, prepare *mysql.PrepareData, call
 	)
 
 	if data.IsOLAP() {
-		return h.streamExecute(c, data, prepare.PrepareStmt, castBindVars(prepare.BindVars), callback)
+		return h.streamExecute(c, data, prepare.PrepareStmt, castBindVars(prepare.BindVars), true, callback)
 	}
 
 	resp, err := h.client.Execute(context.Background(), connect.NewRequest(&psdbpb.ExecuteRequest{
 		Session:       data.Session,
 		Query:         prepare.PrepareStmt,
 		BindVariables: castBindVars(prepare.BindVars),
+		Prepared:      true,
 	}))
 	if resp != nil && resp.Msg != nil {
 		bindSession(c, data, resp.Msg.GetSession())
@@ -257,11 +258,12 @@ func (h *handler) WarningCount(c *mysql.Conn) uint16 {
 	return uint16(len(session.GetVitessSession().GetWarnings()))
 }
 
-func (h *handler) streamExecute(c *mysql.Conn, data *clientData, query string, bindVars map[string]*querypb.BindVariable, callback func(*sqltypes.Result) error) error {
+func (h *handler) streamExecute(c *mysql.Conn, data *clientData, query string, bindVars map[string]*querypb.BindVariable, prepared bool, callback func(*sqltypes.Result) error) error {
 	stream, err := h.client.StreamExecute(context.Background(), connect.NewRequest(&psdbpb.ExecuteRequest{
 		Session:       data.Session,
 		Query:         query,
 		BindVariables: bindVars,
+		Prepared:      prepared,
 	}))
 	if err != nil {
 		return sqlerror.NewSQLErrorFromError(err)
