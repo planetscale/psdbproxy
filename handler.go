@@ -68,6 +68,8 @@ func (h *handler) testCredentials(timeout time.Duration) error {
 }
 
 func (h *handler) NewConnection(c *mysql.Conn) {
+	c.StatusFlags |= mysql.ServerStatusAutocommit
+
 	data := &clientData{
 		start:      time.Now(),
 		remoteAddr: c.RemoteAddr().String(),
