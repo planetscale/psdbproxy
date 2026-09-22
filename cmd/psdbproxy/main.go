@@ -4,7 +4,9 @@ import (
 	"log/slog"
 	"os"
 
+	"connectrpc.com/connect"
 	"github.com/planetscale/psdb/auth"
+	"github.com/planetscale/psdb/core/client"
 	"github.com/planetscale/psdbproxy"
 	"github.com/spf13/pflag"
 	"vitess.io/vitess/go/mysql"
@@ -18,6 +20,9 @@ var (
 	flagHost     = commandLine.StringP("host", "h", "aws.connect.psdb.cloud", "upstream PlanetScale hostname")
 	flagUsername = commandLine.StringP("username", "u", "", "PlanetScale username")
 	flagPassword = commandLine.StringP("password", "p", "", "PlanetScale password")
+
+	flagCompress   = commandLine.StringP("compress", "C", "s2", "compress traffic with given algorithm (identity, gzip, s2)")
+	flagWireFormat = commandLine.StringP("wire-format", "F", "protobuf", "transport wire format (protobuf, json)")
 )
 
 func init() {
@@ -29,6 +34,20 @@ func main() {
 		Level: slog.LevelDebug,
 	}))
 
+	connectOpts := []connect.ClientOption{connect.WithSendCompression(*flagCompress)}
+	switch *flagWireFormat {
+		case "json":
+			connectOpts = append(connectOpts, connect.WithProtoJSON())
+		case "protobuf":
+			// used by default
+		default:
+			logger.Error(
+				"unknown wire format",
+				"format", *flagWireFormat,
+			)
+			os.Exit(1)
+	}
+
 	s := &psdbproxy.Server{
 		Logger:       logger.With(slog.String("component", "proxy")),
 		Addr:         *flagListen,
@@ -37,6 +56,7 @@ func main() {
 			*flagUsername,
 			*flagPassword,
 		),
+		ClientOptions: []client.Option{client.WithExtraClientOptions(connectOpts...)},
 	}
 
 	ch := make(chan error)
@@ -53,5 +73,6 @@ func main() {
 			"oops",
 			"err", err,
 		)
+		os.Exit(1)
 	}
 }
